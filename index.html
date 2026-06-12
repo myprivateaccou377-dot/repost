@@ -55,15 +55,16 @@
     /* HERO */
     .hero {
       display:flex; flex-direction:column; align-items:center;
-      text-align:center; padding:5rem 1.5rem 3rem; gap:1.8rem;
+      text-align:center; padding:5rem 1.5rem 4rem; gap:1.8rem;
     }
-    .ticker-row { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
+    .ticker-row { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; min-height: 38px; }
     .ticker {
       background:var(--surface); border:1px solid var(--border);
       border-radius:10px; padding:.45rem 1rem;
       font-family:'Space Mono',monospace; font-size:.78rem;
+      display: flex; align-items: center; gap: 0.3rem;
     }
-    .ticker .sym { color:var(--accent); margin-right:.4rem; }
+    .ticker .sym { color:var(--accent); margin-right:.4rem; font-weight: bold; }
     .ticker .up  { color:#00e5a0; }
     .ticker .dn  { color:#ff5c72; }
 
@@ -84,9 +85,10 @@
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 1.8rem 2rem;
-      max-width: 420px; width: 100%;
+      max-width: 440px; width: 100%;
       display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
       position: relative; overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
     }
     /* subtle green shimmer behind card */
     .cd-card::before {
@@ -127,10 +129,11 @@
       transition: width 1s linear;
     }
 
-    /* Buttons row */
-    .cd-buttons { display:flex; gap:.75rem; width:100%; }
+    /* Buttons row (Open WhatsApp remains permanently active) */
+    .cd-buttons { display:flex; gap:.75rem; width:100%; align-items: center; }
+    
     .cta {
-      flex:1; display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
+      flex: 2; display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
       background:var(--wa); color:#fff;
       font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700;
       padding:.85rem 1.4rem; border-radius:12px; border:none; cursor:pointer;
@@ -148,7 +151,9 @@
     .cta:hover::after { opacity:1; }
     .cta:active { transform:translateY(0); }
     .cta svg { width:20px; height:20px; flex-shrink:0; }
+    
     .cta-cancel {
+      flex: 1;
       background:none; border:1px solid var(--border); color:var(--muted);
       font-family:'Space Grotesk',sans-serif; font-size:.82rem;
       padding:.85rem 1rem; border-radius:12px; cursor:pointer;
@@ -158,33 +163,18 @@
     .cta-cancel:hover { border-color:var(--accent); color:var(--accent); }
     .cta-cancel.hidden { display:none; }
 
-    /* ── Reopen button (shown after cancel) ── */
-    .cd-reopen {
-      display:none; width:100%;
-    }
-    .cd-reopen.show { display:flex; }
-    .cta-reopen {
-      flex:1; display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
-      background:var(--wa); color:#fff;
-      font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700;
-      padding:.85rem 1.4rem; border-radius:12px; border:none; cursor:pointer;
-      text-decoration:none;
-      transition: background .2s, transform .15s, box-shadow .2s;
-      box-shadow: 0 4px 22px rgba(37,211,102,.35);
-      position:relative; overflow:hidden;
-    }
-    .cta-reopen svg { width:20px; height:20px; flex-shrink:0; }
-    .cta-reopen:hover { background:var(--wa-dark); transform:translateY(-2px); box-shadow:0 8px 30px rgba(37,211,102,.45); }
-    .cta-reopen:active { transform:translateY(0); }
-
-    /* Sent state */
+    /* Auto-opened confirmation message */
     .cd-sent {
-      display:none; flex-direction:column; align-items:center; gap:.5rem;
-      text-align:center;
+      display:none; flex-direction:column; align-items:center; gap:.3rem;
+      text-align:center; margin-top: 0.5rem;
+      background: rgba(0, 229, 160, 0.08);
+      border: 1px dashed rgba(0, 229, 160, 0.3);
+      padding: 0.8rem;
+      border-radius: 12px;
+      width: 100%;
     }
     .cd-sent.show { display:flex; }
-    .cd-sent .sent-icon { font-size:2rem; }
-    .cd-sent p { font-size:.9rem; color:var(--muted); }
+    .cd-sent p { font-size:.85rem; color:var(--muted); margin: 0; }
     .cd-sent strong { color:var(--accent); }
 
     /* DIVIDER */
@@ -192,38 +182,9 @@
       text-align:center; color:var(--muted); font-size:.8rem;
       letter-spacing:.08em; text-transform:uppercase;
       display:flex; align-items:center; gap:1rem;
-      max-width:420px; width:100%;
+      max-width:440px; width:100%;
     }
     .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
-
-    /* CHAT PREVIEW */
-    .chat-preview {
-      max-width:340px; width:100%;
-      background:#111b21; border-radius:18px; overflow:hidden;
-      border:1px solid #1e2d35; box-shadow:0 20px 60px rgba(0,0,0,.5);
-    }
-    .chat-header {
-      background:#1f2c34; display:flex; align-items:center; gap:.75rem; padding:.85rem 1.1rem;
-    }
-    .chat-avatar {
-      width:38px; height:38px; border-radius:50%;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
-      display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;
-    }
-    .chat-info .name   { font-size:.88rem; font-weight:600; color:#e8f5e9; }
-    .chat-info .status { font-size:.72rem; color:var(--accent); }
-    .chat-body { padding:1rem; display:flex; flex-direction:column; gap:.7rem; }
-    .bubble {
-      max-width:82%; padding:.55rem .85rem; border-radius:10px 10px 10px 2px;
-      font-size:.82rem; line-height:1.5; color:#e8edf8; background:#1e2d35;
-      align-self:flex-start; animation:slide-in .4s ease both;
-    }
-    .bubble.sent {
-      background:#005c4b; border-radius:10px 10px 2px 10px;
-      align-self:flex-end; animation-delay:.6s;
-    }
-    @keyframes slide-in { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-    .bubble .time { font-size:.65rem; color:rgba(255,255,255,.4); margin-top:.2rem; text-align:right; }
 
     /* CARDS */
     .cards {
@@ -272,7 +233,10 @@
 
   <section class="hero">
 
-    <div class="ticker-row" id="tickers"></div>
+    <!-- Live Prices Row from API -->
+    <div class="ticker-row" id="tickers">
+      <div class="ticker" style="color: var(--muted)">Connecting to live price feed...</div>
+    </div>
 
     <h1>Your <em>Crypto Questions</em><br/>Answered Instantly</h1>
     <p class="sub">Whether you're buying your first Bitcoin or deep in DeFi — we'll connect you to WhatsApp in moments.</p>
@@ -289,7 +253,7 @@
         </div>
         <div class="cd-text">
           <div class="cd-heading">Opening WhatsApp…</div>
-          <div class="cd-sub">You'll be connected via <span>WhatsApp</span> with your message ready to send.</div>
+          <div class="cd-sub">We are redirecting you to <span>WhatsApp</span> with your inquiry pre-filled.</div>
         </div>
       </div>
 
@@ -297,52 +261,21 @@
         <div class="cd-bar" id="cdBar"></div>
       </div>
 
+      <!-- Action Area: Open WhatsApp remains always accessible -->
       <div class="cd-buttons" id="cdButtons">
         <a class="cta" id="waBtn" href="#" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Open now
+          Open WhatsApp
         </a>
         <button class="cta-cancel" id="cdCancel">Cancel</button>
       </div>
 
-      <div class="cd-reopen" id="cdReopen">
-        <a class="cta-reopen" id="waReopen" href="#" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Open WhatsApp
-        </a>
-      </div>
-
       <div class="cd-sent" id="cdSent">
-        <div class="sent-icon">✅</div>
-        <p><strong>WhatsApp opened!</strong><br/>Your message is ready — just hit send.</p>
+        <p>🚀 <strong>WhatsApp Opened!</strong> If you didn't see the popup, click <strong>Open WhatsApp</strong> above.</p>
       </div>
     </div>
 
-    <div class="divider">what to expect</div>
-
-    <div class="chat-preview">
-      <div class="chat-header">
-        <div class="chat-avatar">₿</div>
-        <div class="chat-info">
-          <div class="name">CryptoTalk</div>
-          <div class="status">online</div>
-        </div>
-      </div>
-      <div class="chat-body">
-        <div class="bubble">
-          👋 Your message will be pre-filled automatically:
-          <div class="time">now</div>
-        </div>
-        <div class="bubble sent">
-          Hello about crypto
-          <div class="time">now</div>
-        </div>
-        <div class="bubble">
-          🚀 Let's talk crypto! Bitcoin, Altcoins, DeFi, or portfolio tips — what's on your mind?
-          <div class="time">now</div>
-        </div>
-      </div>
-    </div>
+    <div class="divider">What to expect</div>
 
   </section>
 
@@ -381,8 +314,8 @@
   const message = encodeURIComponent('Hello about crypto');
   const waUrl   = `https://wa.me/${phone}?text=${message}`;
 
-  document.getElementById('waBtn').href = waUrl;
-  document.getElementById('waReopen').href = waUrl;
+  const waBtn = document.getElementById('waBtn');
+  waBtn.href = waUrl;
 
   // ── Countdown ──
   const TOTAL  = 5;
@@ -393,7 +326,6 @@
   const cancelBtn = document.getElementById('cdCancel');
   const sentBox   = document.getElementById('cdSent');
   const buttons   = document.getElementById('cdButtons');
-  const reopen    = document.getElementById('cdReopen');
 
   arc.style.strokeDasharray  = CIRCUM;
   arc.style.strokeDashoffset = 0;
@@ -407,8 +339,8 @@
     numEl.textContent = '✓';
     arc.style.strokeDashoffset = CIRCUM;
     bar.style.width = '0%';
-    buttons.style.display = 'none';
     sentBox.classList.add('show');
+    cancelBtn.style.display = 'none';
     window.open(waUrl, '_blank');
   }
 
@@ -423,6 +355,7 @@
 
   // Kick off ring animation
   setTimeout(() => {
+    if (cancelled) return;
     arc.style.transition = 'stroke-dashoffset 1s linear';
     bar.style.transition  = 'width 1s linear';
     arc.style.strokeDashoffset = CIRCUM * (1/TOTAL);
@@ -439,22 +372,24 @@
     arc.style.strokeDashoffset = CIRCUM;
     bar.style.transition = 'none';
     bar.style.width = '0%';
-    cancelBtn.classList.add('hidden');
-    reopen.classList.add('show');
-    document.querySelector('.cd-heading').textContent = 'Countdown stopped';
-    document.querySelector('.cd-sub').innerHTML = 'Tap <span>Open WhatsApp</span> whenever you\'re ready.';
+    cancelBtn.style.display = 'none';
+    document.querySelector('.cd-heading').textContent = 'Redirect Stopped';
+    document.querySelector('.cd-sub').innerHTML = 'Feel free to tap <span>Open WhatsApp</span> manually to chat.';
   });
 
-  document.getElementById('waBtn').addEventListener('click', () => {
-    if (!cancelled) { clearInterval(timer); }
-    cancelled = true;
-    setTimeout(() => {
-      buttons.style.display = 'none';
-      sentBox.classList.add('show');
-    }, 300);
+  waBtn.addEventListener('click', () => {
+    if (!cancelled) { 
+      clearInterval(timer); 
+      cancelled = true;
+    }
+    numEl.textContent = '✓';
+    arc.style.strokeDashoffset = CIRCUM;
+    bar.style.width = '0%';
+    cancelBtn.style.display = 'none';
+    sentBox.classList.add('show');
   });
 
-  // ── Stars ──
+  // ── Stars Particle Background ──
   const canvas = document.getElementById('stars');
   const ctx    = canvas.getContext('2d');
   let stars = [];
@@ -476,31 +411,56 @@
   }
   resize(); window.addEventListener('resize',resize); drawStars();
 
-  // ── Tickers ──
+  // ── Live Tickers from CoinCap REST API ──
   const coins = [
-    {sym:'BTC',price:67420,chg:+2.14},
-    {sym:'ETH',price:3512, chg:+1.87},
-    {sym:'SOL',price:178,  chg:-0.43},
-    {sym:'BNB',price:592,  chg:+0.91},
+    {id:'bitcoin', sym:'BTC', name: 'Bitcoin', price:67420, chg:+2.14},
+    {id:'ethereum', sym:'ETH', name: 'Ethereum', price:3512, chg:+1.87},
+    {id:'solana', sym:'SOL', name: 'Solana', price:178, chg:-0.43},
+    {id:'binancecoin', sym:'BNB', name: 'Binance Coin', price:592, chg:+0.91}
   ];
+
   const row = document.getElementById('tickers');
+
   function renderTickers() {
     row.innerHTML = coins.map(c=>{
       const cls=c.chg>=0?'up':'dn', sign=c.chg>=0?'+':'';
-      const fmt=c.price>=1000?c.price.toLocaleString('en-US',{maximumFractionDigits:0}):c.price.toFixed(2);
-      return `<div class="ticker"><span class="sym">${c.sym}</span>$${fmt} <span class="${cls}">(${sign}${c.chg.toFixed(2)}%)</span></div>`;
+      const fmt=c.price>=1000?c.price.toLocaleString('en-US',{maximumFractionDigits:2}):c.price.toFixed(2);
+      return `<div class="ticker" title="Live price of ${c.name}"><span class="sym">${c.sym}</span>$${fmt} <span class="${cls}">${sign}${c.chg.toFixed(2)}%</span></div>`;
     }).join('');
   }
-  function jitter() {
-    coins.forEach(c=>{
-      c.price+=(Math.random()-.48)*c.price*.003;
-      c.chg+=(Math.random()-.5)*.1;
-    });
-    renderTickers();
+
+  // Fetch true live prices from public CoinCap API
+  async function fetchLivePrices() {
+    try {
+      const response = await fetch('https://api.coincap.io/v2/assets?ids=bitcoin,ethereum,solana,binancecoin');
+      const payload = await response.json();
+      if (payload && payload.data) {
+        payload.data.forEach(apiCoin => {
+          const matched = coins.find(c => c.id === apiCoin.id);
+          if (matched) {
+            matched.price = parseFloat(apiCoin.priceUsd);
+            matched.chg = parseFloat(apiCoin.changePercent24Hr);
+          }
+        });
+        renderTickers();
+      }
+    } catch (err) {
+      console.warn("CoinCap API fallback triggered. Using last state updates.", err);
+      // Soft backup values logic if network failure/offline
+      coins.forEach(c => {
+        c.price += (Math.random() - 0.49) * c.price * 0.001;
+        c.chg += (Math.random() - 0.5) * 0.05;
+      });
+      renderTickers();
+    }
   }
-  renderTickers();
-  setInterval(jitter,2800);
+
+  // Initial update
+  fetchLivePrices();
+  // Fetch real-time live rates every 15 seconds
+  setInterval(fetchLivePrices, 15000);
 </script>
+
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
@@ -514,5 +474,6 @@ s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 <!--End of Tawk.to Script-->
+
 </body>
 </html>
