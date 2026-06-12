@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crypto Chat — Let's Talk Bitcoin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #080b14;
+      --surface: #0e1425;
+      --border:  #1c2540;
+      --accent:  #00e5a0;
+      --accent2: #7b5cff;
+      --text:    #e8edf8;
+      --muted:   #6b7896;
+      --wa:      #25D366;
+      --wa-dark: #1ebe5c;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .wrap  { position: relative; z-index: 1; }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 2rem;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: rgba(8,11,20,.75);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-family:'Space Mono',monospace; font-size:1.1rem; font-weight:700; color:var(--accent); }
+    .logo span { color: var(--text); }
+    .badge {
+      background: rgba(0,229,160,.12); border:1px solid rgba(0,229,160,.3);
+      color: var(--accent); font-size:.72rem; font-weight:600;
+      padding:.25rem .7rem; border-radius:100px;
+      letter-spacing:.06em; text-transform:uppercase;
+      animation: pulse-badge 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse-badge { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    /* HERO */
+    .hero {
+      display:flex; flex-direction:column; align-items:center;
+      text-align:center; padding:5rem 1.5rem 3rem; gap:1.8rem;
+    }
+    .ticker-row { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
+    .ticker {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:10px; padding:.45rem 1rem;
+      font-family:'Space Mono',monospace; font-size:.78rem;
+    }
+    .ticker .sym { color:var(--accent); margin-right:.4rem; }
+    .ticker .up  { color:#00e5a0; }
+    .ticker .dn  { color:#ff5c72; }
+
+    h1 {
+      font-size: clamp(2.2rem,6vw,4.5rem);
+      font-weight:700; line-height:1.08; letter-spacing:-.03em; max-width:780px;
+    }
+    h1 em {
+      font-style:normal;
+      background:linear-gradient(100deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .sub { font-size:1.05rem; color:var(--muted); max-width:500px; line-height:1.65; }
+
+    /* ── INLINE COUNTDOWN CARD ── */
+    .cd-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.8rem 2rem;
+      max-width: 420px; width: 100%;
+      display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+      position: relative; overflow: hidden;
+    }
+    /* subtle green shimmer behind card */
+    .cd-card::before {
+      content:''; position:absolute; inset:0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,229,160,.07) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .cd-top {
+      display:flex; align-items:center; gap:1.2rem; width:100%;
+    }
+    /* Ring */
+    .cd-ring { position:relative; width:80px; height:80px; flex-shrink:0; }
+    .cd-ring svg { transform:rotate(-90deg); }
+    .cd-ring circle.track    { fill:none; stroke:var(--border); stroke-width:6; }
+    .cd-ring circle.progress {
+      fill:none; stroke:var(--accent); stroke-width:6; stroke-linecap:round;
+      stroke-dasharray:213; stroke-dashoffset:0;
+      transition: stroke-dashoffset 1s linear;
+      filter: drop-shadow(0 0 5px var(--accent));
+    }
+    .cd-number {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Space Mono',monospace; font-size:1.9rem; font-weight:700; color:var(--accent);
+    }
+    .cd-text { flex:1; text-align:left; }
+    .cd-text .cd-heading { font-size:1rem; font-weight:700; margin-bottom:.3rem; }
+    .cd-text .cd-sub     { font-size:.82rem; color:var(--muted); line-height:1.5; }
+    .cd-text .cd-sub span { color:var(--accent); font-weight:600; }
+
+    /* Progress bar */
+    .cd-bar-wrap {
+      width:100%; height:4px; background:var(--border); border-radius:100px; overflow:hidden;
+    }
+    .cd-bar {
+      height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2));
+      border-radius:100px; width:100%;
+      transition: width 1s linear;
+    }
+
+    /* Buttons row */
+    .cd-buttons { display:flex; gap:.75rem; width:100%; }
+    .cta {
+      flex:1; display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
+      background:var(--wa); color:#fff;
+      font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700;
+      padding:.85rem 1.4rem; border-radius:12px; border:none; cursor:pointer;
+      text-decoration:none;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 22px rgba(37,211,102,.35);
+      position:relative; overflow:hidden;
+    }
+    .cta::after {
+      content:''; position:absolute; inset:0;
+      background:rgba(255,255,255,.08);
+      opacity:0; transition:opacity .2s;
+    }
+    .cta:hover { background:var(--wa-dark); transform:translateY(-2px); box-shadow:0 8px 30px rgba(37,211,102,.45); }
+    .cta:hover::after { opacity:1; }
+    .cta:active { transform:translateY(0); }
+    .cta svg { width:20px; height:20px; flex-shrink:0; }
+    .cta-cancel {
+      background:none; border:1px solid var(--border); color:var(--muted);
+      font-family:'Space Grotesk',sans-serif; font-size:.82rem;
+      padding:.85rem 1rem; border-radius:12px; cursor:pointer;
+      transition: border-color .2s, color .2s;
+      white-space:nowrap;
+    }
+    .cta-cancel:hover { border-color:var(--accent); color:var(--accent); }
+    .cta-cancel.hidden { display:none; }
+
+    /* ── Reopen button (shown after cancel) ── */
+    .cd-reopen {
+      display:none; width:100%;
+    }
+    .cd-reopen.show { display:flex; }
+    .cta-reopen {
+      flex:1; display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
+      background:var(--wa); color:#fff;
+      font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700;
+      padding:.85rem 1.4rem; border-radius:12px; border:none; cursor:pointer;
+      text-decoration:none;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 22px rgba(37,211,102,.35);
+      position:relative; overflow:hidden;
+    }
+    .cta-reopen svg { width:20px; height:20px; flex-shrink:0; }
+    .cta-reopen:hover { background:var(--wa-dark); transform:translateY(-2px); box-shadow:0 8px 30px rgba(37,211,102,.45); }
+    .cta-reopen:active { transform:translateY(0); }
+
+    /* Sent state */
+    .cd-sent {
+      display:none; flex-direction:column; align-items:center; gap:.5rem;
+      text-align:center;
+    }
+    .cd-sent.show { display:flex; }
+    .cd-sent .sent-icon { font-size:2rem; }
+    .cd-sent p { font-size:.9rem; color:var(--muted); }
+    .cd-sent strong { color:var(--accent); }
+
+    /* DIVIDER */
+    .divider {
+      text-align:center; color:var(--muted); font-size:.8rem;
+      letter-spacing:.08em; text-transform:uppercase;
+      display:flex; align-items:center; gap:1rem;
+      max-width:420px; width:100%;
+    }
+    .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* CHAT PREVIEW */
+    .chat-preview {
+      max-width:340px; width:100%;
+      background:#111b21; border-radius:18px; overflow:hidden;
+      border:1px solid #1e2d35; box-shadow:0 20px 60px rgba(0,0,0,.5);
+    }
+    .chat-header {
+      background:#1f2c34; display:flex; align-items:center; gap:.75rem; padding:.85rem 1.1rem;
+    }
+    .chat-avatar {
+      width:38px; height:38px; border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;
+    }
+    .chat-info .name   { font-size:.88rem; font-weight:600; color:#e8f5e9; }
+    .chat-info .status { font-size:.72rem; color:var(--accent); }
+    .chat-body { padding:1rem; display:flex; flex-direction:column; gap:.7rem; }
+    .bubble {
+      max-width:82%; padding:.55rem .85rem; border-radius:10px 10px 10px 2px;
+      font-size:.82rem; line-height:1.5; color:#e8edf8; background:#1e2d35;
+      align-self:flex-start; animation:slide-in .4s ease both;
+    }
+    .bubble.sent {
+      background:#005c4b; border-radius:10px 10px 2px 10px;
+      align-self:flex-end; animation-delay:.6s;
+    }
+    @keyframes slide-in { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .bubble .time { font-size:.65rem; color:rgba(255,255,255,.4); margin-top:.2rem; text-align:right; }
+
+    /* CARDS */
+    .cards {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:1rem; max-width:860px; margin:0 auto; padding:2rem 1.5rem 5rem;
+    }
+    .card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:16px; padding:1.5rem;
+      display:flex; flex-direction:column; gap:.7rem;
+      transition:border-color .2s,transform .2s;
+    }
+    .card:hover { border-color:var(--accent); transform:translateY(-3px); }
+    .card-icon {
+      font-size:1.7rem; width:48px; height:48px;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(0,229,160,.08); border-radius:12px;
+    }
+    .card h3 { font-size:.95rem; font-weight:600; }
+    .card p  { font-size:.82rem; color:var(--muted); line-height:1.5; }
+
+    footer {
+      text-align:center; padding:2rem 1.5rem;
+      border-top:1px solid var(--border);
+      color:var(--muted); font-size:.78rem; line-height:1.8;
+    }
+    footer a { color:var(--accent); text-decoration:none; }
+
+    @media(max-width:520px){
+      nav { padding:1rem 1.2rem; }
+      .hero { padding:3.5rem 1.2rem 2rem; }
+      .cd-card { padding:1.4rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="wrap">
+
+  <nav>
+    <div class="logo">₿<span>Crypto</span>Talk</div>
+    <div class="badge">● Live Chat</div>
+  </nav>
+
+  <section class="hero">
+
+    <div class="ticker-row" id="tickers"></div>
+
+    <h1>Your <em>Crypto Questions</em><br/>Answered Instantly</h1>
+    <p class="sub">Whether you're buying your first Bitcoin or deep in DeFi — we'll connect you to WhatsApp in moments.</p>
+
+    <!-- ── INLINE COUNTDOWN CARD ── -->
+    <div class="cd-card" id="cdCard">
+      <div class="cd-top">
+        <div class="cd-ring">
+          <svg viewBox="0 0 80 80" width="80" height="80">
+            <circle class="track"    cx="40" cy="40" r="34"/>
+            <circle class="progress" cx="40" cy="40" r="34" id="cdArc"/>
+          </svg>
+          <div class="cd-number" id="cdNum">5</div>
+        </div>
+        <div class="cd-text">
+          <div class="cd-heading">Opening WhatsApp…</div>
+          <div class="cd-sub">You'll be connected via <span>WhatsApp</span> with your message ready to send.</div>
+        </div>
+      </div>
+
+      <div class="cd-bar-wrap">
+        <div class="cd-bar" id="cdBar"></div>
+      </div>
+
+      <div class="cd-buttons" id="cdButtons">
+        <a class="cta" id="waBtn" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Open now
+        </a>
+        <button class="cta-cancel" id="cdCancel">Cancel</button>
+      </div>
+
+      <div class="cd-reopen" id="cdReopen">
+        <a class="cta-reopen" id="waReopen" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Open WhatsApp
+        </a>
+      </div>
+
+      <div class="cd-sent" id="cdSent">
+        <div class="sent-icon">✅</div>
+        <p><strong>WhatsApp opened!</strong><br/>Your message is ready — just hit send.</p>
+      </div>
+    </div>
+
+    <div class="divider">what to expect</div>
+
+    <div class="chat-preview">
+      <div class="chat-header">
+        <div class="chat-avatar">₿</div>
+        <div class="chat-info">
+          <div class="name">CryptoTalk</div>
+          <div class="status">online</div>
+        </div>
+      </div>
+      <div class="chat-body">
+        <div class="bubble">
+          👋 Your message will be pre-filled automatically:
+          <div class="time">now</div>
+        </div>
+        <div class="bubble sent">
+          Hello about crypto
+          <div class="time">now</div>
+        </div>
+        <div class="bubble">
+          🚀 Let's talk crypto! Bitcoin, Altcoins, DeFi, or portfolio tips — what's on your mind?
+          <div class="time">now</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <h3>Market Signals</h3>
+      <p>Real-time insights on BTC, ETH, and top altcoins to help you stay ahead of moves.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔐</div>
+      <h3>Safe Trading Tips</h3>
+      <p>Learn how to secure your wallet, avoid scams, and trade with confidence.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💡</div>
+      <h3>Beginner Friendly</h3>
+      <p>New to crypto? No problem. I'll walk you through everything step by step.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h3>Instant Replies</h3>
+      <p>Reach me directly on WhatsApp and get fast answers to your crypto questions.</p>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 CryptoTalk &nbsp;·&nbsp; <a href="https://wa.me/447876865287">Chat on WhatsApp</a><br/>
+    This is not financial advice. Always do your own research.
+  </footer>
+
+</div>
+
+<script>
+  const phone   = '447876865287';
+  const message = encodeURIComponent('Hello about crypto');
+  const waUrl   = `https://wa.me/${phone}?text=${message}`;
+
+  document.getElementById('waBtn').href = waUrl;
+  document.getElementById('waReopen').href = waUrl;
+
+  // ── Countdown ──
+  const TOTAL  = 5;
+  const CIRCUM = 2 * Math.PI * 34;
+  const arc    = document.getElementById('cdArc');
+  const numEl  = document.getElementById('cdNum');
+  const bar    = document.getElementById('cdBar');
+  const cancelBtn = document.getElementById('cdCancel');
+  const sentBox   = document.getElementById('cdSent');
+  const buttons   = document.getElementById('cdButtons');
+  const reopen    = document.getElementById('cdReopen');
+
+  arc.style.strokeDasharray  = CIRCUM;
+  arc.style.strokeDashoffset = 0;
+  bar.style.width = '100%';
+
+  let remaining = TOTAL;
+  let cancelled = false;
+
+  function goToWA() {
+    if (cancelled) return;
+    numEl.textContent = '✓';
+    arc.style.strokeDashoffset = CIRCUM;
+    bar.style.width = '0%';
+    buttons.style.display = 'none';
+    sentBox.classList.add('show');
+    window.open(waUrl, '_blank');
+  }
+
+  function tick() {
+    if (cancelled) return;
+    remaining--;
+    numEl.textContent = remaining > 0 ? remaining : '✓';
+    arc.style.strokeDashoffset = CIRCUM * (1 - remaining / TOTAL);
+    bar.style.width = (remaining / TOTAL * 100) + '%';
+    if (remaining <= 0) { clearInterval(timer); goToWA(); }
+  }
+
+  // Kick off ring animation
+  setTimeout(() => {
+    arc.style.transition = 'stroke-dashoffset 1s linear';
+    bar.style.transition  = 'width 1s linear';
+    arc.style.strokeDashoffset = CIRCUM * (1/TOTAL);
+    bar.style.width = ((TOTAL-1)/TOTAL*100) + '%';
+  }, 80);
+
+  const timer = setInterval(tick, 1000);
+
+  cancelBtn.addEventListener('click', () => {
+    cancelled = true;
+    clearInterval(timer);
+    numEl.textContent = '—';
+    arc.style.transition = 'none';
+    arc.style.strokeDashoffset = CIRCUM;
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    cancelBtn.classList.add('hidden');
+    reopen.classList.add('show');
+    document.querySelector('.cd-heading').textContent = 'Countdown stopped';
+    document.querySelector('.cd-sub').innerHTML = 'Tap <span>Open WhatsApp</span> whenever you\'re ready.';
+  });
+
+  document.getElementById('waBtn').addEventListener('click', () => {
+    if (!cancelled) { clearInterval(timer); }
+    cancelled = true;
+    setTimeout(() => {
+      buttons.style.display = 'none';
+      sentBox.classList.add('show');
+    }, 300);
+  });
+
+  // ── Stars ──
+  const canvas = document.getElementById('stars');
+  const ctx    = canvas.getContext('2d');
+  let stars = [];
+  function resize() {
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    stars = Array.from({length:140},()=>({
+      x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+      r:Math.random()*1.2+.3, o:Math.random(), s:Math.random()*.004+.001
+    }));
+  }
+  function drawStars() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s=>{
+      s.o+=s.s; if(s.o>1||s.o<0) s.s*=-1;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,229,160,${s.o*.6})`; ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  resize(); window.addEventListener('resize',resize); drawStars();
+
+  // ── Tickers ──
+  const coins = [
+    {sym:'BTC',price:67420,chg:+2.14},
+    {sym:'ETH',price:3512, chg:+1.87},
+    {sym:'SOL',price:178,  chg:-0.43},
+    {sym:'BNB',price:592,  chg:+0.91},
+  ];
+  const row = document.getElementById('tickers');
+  function renderTickers() {
+    row.innerHTML = coins.map(c=>{
+      const cls=c.chg>=0?'up':'dn', sign=c.chg>=0?'+':'';
+      const fmt=c.price>=1000?c.price.toLocaleString('en-US',{maximumFractionDigits:0}):c.price.toFixed(2);
+      return `<div class="ticker"><span class="sym">${c.sym}</span>$${fmt} <span class="${cls}">(${sign}${c.chg.toFixed(2)}%)</span></div>`;
+    }).join('');
+  }
+  function jitter() {
+    coins.forEach(c=>{
+      c.price+=(Math.random()-.48)*c.price*.003;
+      c.chg+=(Math.random()-.5)*.1;
+    });
+    renderTickers();
+  }
+  renderTickers();
+  setInterval(jitter,2800);
+</script>
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6a10889b8185521c3224bccb/1jp89b8am';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+</body>
+</html>
